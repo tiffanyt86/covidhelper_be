@@ -15,9 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import HelloWorld
+from django.urls.conf import include
+from app.views import Hello, RegisterView
+import debug_toolbar
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HelloWorld.as_view())
+    # path('api/', include(app.urls)),
+    # path('register/', RegisterView.as_view())
+    path('__debug__/', include('debug_toolbar.urls')),
+    path('app/', include('app.urls')),
+    # path('', include('app.urls')),
 ]
