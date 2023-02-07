@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from .models import Patient, Vaccine
 from django.contrib.auth.models import User
 from rest_framework import serializers
