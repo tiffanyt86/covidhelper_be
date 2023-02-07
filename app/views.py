@@ -22,7 +22,6 @@ class HelloWorld(APIView):
 
 # @method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
-    # permission_classes = (permissions.AllowAny, )
     permission_classes = [IsNotAuthenticated]
 
     def post(self, request, format=None):
@@ -34,19 +33,14 @@ class RegisterView(APIView):
         first_name=data["first_name"]
         last_name=data["last_name"]
 
-        print(username)
-        print(email)
-        print(password)
-        print(first_name)
-        print(last_name)
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+            print(user.id)
+            return Response({ 'error': 'Sorry, username already taken' })
+        
+        # create a user object
+        user = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name)
 
-        return Response("Success!")
-
-        # if User.objects.filter(username=username).exists():
-        #     return Response({ 'error': 'Sorry, username already taken' })
-        # else:
-        #     user = User.objects.create_user(username=username, email=email, password=password, first_name=first_name, last_name=last_name)
-        #     user = User.objects.get(id=user.id)
-
-
-            # return Response({ 'success': 'User {user.username} created' })
+        # fetch the user from the database
+        user = User.objects.get(id=user.id)
+        return Response('success: User ' + user.username + ' created')
