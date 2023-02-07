@@ -16,14 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
-from app.views import Hello, RegisterView
-import debug_toolbar
+from app.views import HelloWorld, RegisterView
+from . import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/', include(app.urls)),
-    # path('register/', RegisterView.as_view())
-    path('__debug__/', include('debug_toolbar.urls')),
-    path('app/', include('app.urls')),
-    # path('', include('app.urls')),
+    path('hello/', HelloWorld.as_view(), name='hello'),
+    path('register/', RegisterView.as_view(), name='register')
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+
+    list.append(urlpatterns, path('__debug__/', include('debug_toolbar.urls')))

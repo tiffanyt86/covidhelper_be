@@ -14,7 +14,7 @@ from .permissions import IsNotAuthenticated
 #     serializer_class = VaccineSerializer
 #     queryset = Vaccine.objects.all()
 
-class Hello(APIView):
+class HelloWorld(APIView):
     permission_classes = [IsNotAuthenticated]
 
     def get(self, request, format=None):

@@ -6,7 +6,7 @@ from .views import Hello
 # router = routers.DefaultRouter()
 # router.register('hello', HelloWorld, 'hello')
 
-urlpatterns = [
-    # path('', include(router.urls)),
-    path('hello/', Hello.as_view(), name='hello')
-]
+# urlpatterns = [
+#     # path('', include(router.urls)),
+#     path('hello/', Hello.as_view(), name='hello')
+# ]
