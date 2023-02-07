@@ -4,17 +4,13 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from .serializers import UserSerializer, VaccineSerializer, PatientSerializer
+from .serializers import VaccineSerializer, PatientSerializer #, UserSerializer
+from rest_framework import viewsets
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 # from .permissions import IsNotAuthenticated
-
-# MODEL VIEWS
-
-# class VaccineViewSet(viewsets.ModelViewSet):
-#     serializer_class = VaccineSerializer
-#     queryset = Vaccine.objects.all()
 
 class HelloWorld(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -80,9 +76,9 @@ class LoginView(APIView):
 
         if user is not None:
             auth.login(request, user)
-            return Response({ "Success": "User authenticated", "username": username })
+            return Response({ "Success": "logged in as " + username })
         
-        return Response({ "error": "Error authenticating" })
+        return Response({ "error": "Error logging in..." })
 
 class LogoutView(APIView):
     def post(self, request, format=None):
@@ -91,3 +87,24 @@ class LogoutView(APIView):
             return Response({ "success": "Logged Out" })
         except:
             return Response({ "error": "Something went wrong when logging out" })
+
+# MODEL VIEWS
+
+class VaccineViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = VaccineSerializer
+    
+    def get_queryset(self):
+        vaccines = Vaccine.objects.all()
+
+        return vaccines
+
+class PatientViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = PatientSerializer
+    
+    def get_queryset(self):
+        patients = Patient.objects.all()
+
+        return patients
+    
