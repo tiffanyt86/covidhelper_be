@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth import get_user_model
+from django.conf import settings
 
 class Vaccine(models.Model):
     AGE_CHOICE_1 = '6 mos to 4 years'
@@ -32,7 +32,6 @@ class Vaccine(models.Model):
     # pic = 
     ndc = models.CharField(max_length=50, default='-')
     link = models.CharField(max_length=255, default='-')
-    users = models.ManyToManyField(get_user_model())
 
     class Meta:
         ordering = ['-name']
@@ -46,12 +45,15 @@ class Patient(models.Model):
     dob = models.DateField(default='1999-11-10')
     comorbidities = models.BooleanField(default=False)
     allergies = models.BooleanField(default=False)
-    vac_received = models.SmallIntegerField(default=0)
-    vac_given = models.DateField(default='1999-11-10')
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    provider = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-last_name']
 
     def __str__(self):
         return "%s, %s" % (self.last_name, self.first_name)
+ 
+class VaccineRecord(models.Model):
+    patient_id = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    vaccine_id = models.ForeignKey(Vaccine, on_delete=models.CASCADE)
+    date_administered = models.DateField(null=False)

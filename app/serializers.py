@@ -15,6 +15,14 @@ class VaccineSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class PatientSerializer(serializers.ModelSerializer):
+    provider_id = serializers.ReadOnlyField(source='request.user.id')
+    # provider_id = serializers.ReadOnlyField(source='request.user.id')
     class Meta:
         model = Patient
-        fields = "__all__"
+        fields = '__all__'
+    
+    def create(self, validated_data):
+        """
+        Create and return a new `Snippet` instance, given the validated data.
+        """
+        return Patient.objects.create(**validated_data)

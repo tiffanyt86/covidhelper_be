@@ -1,16 +1,17 @@
 from django.shortcuts import render
+from django.http import Http404
 from .models import Patient, Vaccine
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from .serializers import VaccineSerializer, PatientSerializer #, UserSerializer
-from rest_framework import viewsets
+from .serializers import VaccineSerializer, PatientSerializer
+from rest_framework import viewsets, status
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+# from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-# from .permissions import IsNotAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
+from rest_framework.authtoken.models import Token
 
 class HelloWorld(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -62,7 +63,8 @@ class RegisterView(APIView):
         user = User.objects.get(id=user.id)
         return Response('success: User ' + user.username + ' created')
 
-@method_decorator(csrf_protect, name='dispatch')
+# might need to remove this method decorator
+# @method_decorator(csrf_protect, name='dispatch')
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -75,18 +77,20 @@ class LoginView(APIView):
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
+            token, _ = Token.objects.get_or_create(user=user)
+            print(token)
             auth.login(request, user)
-            return Response({ "Success": "logged in as " + username })
+            return Response(token.key)
         
         return Response({ "error": "Error logging in..." })
 
 class LogoutView(APIView):
     def post(self, request, format=None):
         try: 
-            auth.logout(request)
-            return Response({ "success": "Logged Out" })
+            request.user.auth_token.delete()
+            return Response("successfully logged out")
         except:
-            return Response({ "error": "Something went wrong when logging out" })
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 # MODEL VIEWS
 
@@ -100,11 +104,31 @@ class VaccineViewSet(viewsets.ModelViewSet):
         return vaccines
 
 class PatientViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = PatientSerializer
     
     def get_queryset(self):
         patients = Patient.objects.all()
 
         return patients
+
+class MyPatientsList(APIView):
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, format=None):
+        patients = Patient.objects.filter(provider_id=request.user.id)
+        serializer = PatientSerializer(patients, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, format=None):
+        print(request.data)
+        serializer = PatientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    
+
     
