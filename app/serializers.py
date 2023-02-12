@@ -1,4 +1,4 @@
-from .models import Patient, Vaccine
+from .models import Patient, Vaccine, VaccineRecord
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
@@ -22,7 +22,9 @@ class PatientSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def create(self, validated_data):
-        """
-        Create and return a new `Snippet` instance, given the validated data.
-        """
         return Patient.objects.create(**validated_data)
+
+class VaccineRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VaccineRecord
+        fields = "__all__"

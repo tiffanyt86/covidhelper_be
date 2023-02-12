@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.http import Http404
-from .models import Patient, Vaccine
+from .models import Patient, Vaccine, VaccineRecord
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
-from .serializers import VaccineSerializer, PatientSerializer
+from .serializers import VaccineSerializer, PatientSerializer, VaccineRecordSerializer
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 # from rest_framework.viewsets import ModelViewSet
@@ -78,11 +78,11 @@ class LoginView(APIView):
 
         if user is not None:
             token, _ = Token.objects.get_or_create(user=user)
-            print(token)
             auth.login(request, user)
-            return Response(token.key)
+            return Response([token.key, user.pk])
         
-        return Response({ "error": "Error logging in..." })
+        # return Response({ "error": "Error logging in..." })
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class LogoutView(APIView):
     def post(self, request, format=None):
@@ -128,7 +128,14 @@ class MyPatientsList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class VaccineRecordViewset(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = VaccineRecordSerializer
     
+    def get_queryset(self):
+        records = VaccineRecord.objects.all()
+
+        return records
     
 
     

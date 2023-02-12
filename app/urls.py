@@ -1,11 +1,13 @@
 from rest_framework import routers
 from django.urls import path, include
-from .views import HelloWorld, RegisterView, LoginView, LogoutView, GetCSRFToken, VaccineViewSet, MyPatientsList, PatientViewSet
+from .views import HelloWorld, RegisterView, LoginView, LogoutView, GetCSRFToken, VaccineViewSet, MyPatientsList, PatientViewSet, VaccineRecordViewset
+
 from rest_framework.authtoken.views import obtain_auth_token
 
 router = routers.DefaultRouter()
 router.register('vaccines', VaccineViewSet, 'vaccines'),
-router.register('patients', PatientViewSet, 'patients')
+router.register('patients', PatientViewSet, 'patients'),
+router.register('records', VaccineRecordViewset, 'records')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -17,7 +19,3 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('my_patients/', MyPatientsList.as_view(), name='my_patients')
 ]
-
-# token = s3tphzYGWFnYa0XLqzdEP5y6wUgMM1fW
-# username = user2
-# password = password
