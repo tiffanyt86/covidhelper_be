@@ -99,7 +99,23 @@ class VaccineViewSet(viewsets.ModelViewSet):
     serializer_class = VaccineSerializer
     
     def get_queryset(self):
-        vaccines = Vaccine.objects.all()
+
+        ids = self.request.query_params.get('ids')
+        print("Printing ids...")
+        print(type(ids))
+        print(ids)
+        print("finished printing ids")
+
+        if ids is None:
+            return Vaccine.objects.all()
+
+        vaccine_ids = [int(x) for x in ids.split(',')]
+        print("Printing vaccine ids...")
+        print(vaccine_ids)
+        print(type(vaccine_ids))
+        print("end of vaccine ids...")
+
+        vaccines = Vaccine.objects.filter(id__in=vaccine_ids)
 
         return vaccines
 
@@ -132,10 +148,31 @@ class VaccineRecordViewset(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = VaccineRecordSerializer
     
-    def get_queryset(self):
-        records = VaccineRecord.objects.all()
+    # def get_queryset(self):
+    #     records = VaccineRecord.objects.all()
 
-        return records
+    #     return records
+
+    def get_queryset(self):
+
+        ids = self.request.query_params.get('ids')
+        print("Printing ids...")
+        print(type(ids))
+        print(ids)
+        print("finished printing ids")
+
+        if ids is None:
+            return VaccineRecord.objects.all()
+
+        patient_ids = [int(x) for x in ids.split(',')]
+        print("Printing vaccine ids...")
+        print(patient_ids)
+        print(type(patient_ids))
+        print("end of patient ids...")
+
+        patients = VaccineRecord.objects.filter(patient_id__in=patient_ids)
+
+        return patients
     
 
     
